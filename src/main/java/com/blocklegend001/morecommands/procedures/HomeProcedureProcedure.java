@@ -1,54 +1,41 @@
 package com.blocklegend001.morecommands.procedures;
 
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.chat.TextComponent;
 
-import java.util.Map;
-import java.util.Collections;
-
-import com.blocklegend001.morecommands.MorecommandsModVariables;
-import com.blocklegend001.morecommands.MorecommandsMod;
+import com.blocklegend001.morecommands.network.MorecommandsModVariables;
 
 public class HomeProcedureProcedure {
-
-	public static void executeProcedure(Map<String, Object> dependencies) {
-		if (dependencies.get("entity") == null) {
-			if (!dependencies.containsKey("entity"))
-				MorecommandsMod.LOGGER.warn("Failed to load dependency entity for procedure HomeProcedure!");
+	public static void execute(Entity entity) {
+		if (entity == null)
 			return;
-		}
-		Entity entity = (Entity) dependencies.get("entity");
 		if ((entity.getCapability(MorecommandsModVariables.PLAYER_VARIABLES_CAPABILITY, null)
 				.orElse(new MorecommandsModVariables.PlayerVariables())).has_home == false) {
-			if (entity instanceof PlayerEntity && !entity.world.isRemote()) {
-				((PlayerEntity) entity).sendStatusMessage(new StringTextComponent("You don't have a home set for the moment. Please set a new one"),
-						(false));
-			}
+			if (entity instanceof Player _player && !_player.level.isClientSide())
+				_player.displayClientMessage(new TextComponent("You don't have a home set for the moment. Please set a new one"), (false));
 		} else {
-			if (entity instanceof PlayerEntity && !entity.world.isRemote()) {
-				((PlayerEntity) entity).sendStatusMessage(new StringTextComponent("Teleporting to your home..."), (false));
-			}
+			if (entity instanceof Player _player && !_player.level.isClientSide())
+				_player.displayClientMessage(new TextComponent("Teleporting to your home..."), (false));
 			{
 				Entity _ent = entity;
-				_ent.setPositionAndUpdate(
+				_ent.teleportTo(
 						((entity.getCapability(MorecommandsModVariables.PLAYER_VARIABLES_CAPABILITY, null)
 								.orElse(new MorecommandsModVariables.PlayerVariables())).home_x),
 						((entity.getCapability(MorecommandsModVariables.PLAYER_VARIABLES_CAPABILITY, null)
 								.orElse(new MorecommandsModVariables.PlayerVariables())).home_y),
 						((entity.getCapability(MorecommandsModVariables.PLAYER_VARIABLES_CAPABILITY, null)
 								.orElse(new MorecommandsModVariables.PlayerVariables())).home_z));
-				if (_ent instanceof ServerPlayerEntity) {
-					((ServerPlayerEntity) _ent).connection.setPlayerLocation(
+				if (_ent instanceof ServerPlayer _serverPlayer)
+					_serverPlayer.connection.teleport(
 							((entity.getCapability(MorecommandsModVariables.PLAYER_VARIABLES_CAPABILITY, null)
 									.orElse(new MorecommandsModVariables.PlayerVariables())).home_x),
 							((entity.getCapability(MorecommandsModVariables.PLAYER_VARIABLES_CAPABILITY, null)
 									.orElse(new MorecommandsModVariables.PlayerVariables())).home_y),
 							((entity.getCapability(MorecommandsModVariables.PLAYER_VARIABLES_CAPABILITY, null)
 									.orElse(new MorecommandsModVariables.PlayerVariables())).home_z),
-							_ent.rotationYaw, _ent.rotationPitch, Collections.emptySet());
-				}
+							_ent.getYRot(), _ent.getXRot());
 			}
 		}
 	}
