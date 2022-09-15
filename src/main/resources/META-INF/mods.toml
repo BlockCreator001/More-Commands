@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[36,)"
+loaderVersion="[40,)"
 license="MIT License"
 
 [[mods]]
@@ -16,7 +16,7 @@ A simple mod, that add a lots of commands
 [[dependencies.morecommands]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.5]"
+    versionRange="[1.18.2]"
     ordering="NONE"
     side="BOTH"
 
